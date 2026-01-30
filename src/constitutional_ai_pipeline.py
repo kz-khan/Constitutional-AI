@@ -63,7 +63,7 @@ class ConstitutionalAIPipeline:
         data_mgr = DataManager()
         data_mgr.prepare(count=100,force_download=False)
 
-        dataset = data_mgr.load_local_prompts(count=1)
+        dataset = data_mgr.load_local_prompts(count=100) # we will work with 100 samples
         print(f"[INFO] Loaded dataset with {len(dataset)} samples.")        
 
         rows = []

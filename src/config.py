@@ -11,9 +11,9 @@ SNAPSHOT_HASH = "aa8e72537993ba99e69dfaafa59ed015b17504d1"
 SNAPSHOT_DIR = f"/cache/models--Qwen--Qwen2.5-3B-Instruct/snapshots/{SNAPSHOT_HASH}"
 
 
-MAX_REVISIONS = 1
+MAX_REVISIONS = 3
 # ---------------- generate and save files using this config, keep one true at a time ---------
-INIT_GENERATION_MODE = False
+INIT_GENERATION_MODE = True
 CRITIQUE_MODE = False
-REVISION_MODE = True
-CURRENT_ITERATION = 1
+REVISION_MODE = False
+CURRENT_ITERATION = 0
