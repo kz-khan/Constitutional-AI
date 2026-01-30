@@ -1,10 +1,8 @@
-from config import CONSTITUTION_FILE_PATH, OUTPUT_PATH
-from data_manager import DataManager
+from config import SNAPSHOT_DIR, CONSTITUTION_FILE_PATH, INIT_GENERATION_MODE,CRITIQUE_MODE,REVISION_MODE, CURRENT_ITERATION
 from model_wrapper import ModelWrapper
 from constitutional_critic import ConstitutionalCritic
 from constitutional_ai_pipeline import ConstitutionalAIPipeline
 from sampling import SamplingParams
-from datetime import datetime
 import os
 
 def main():
@@ -24,12 +22,23 @@ def main():
     # -------------------------------------------------
     # Load model + tokenizer (via ModelWrapper)
     # -------------------------------------------------
-    model_name_or_path="Qwen/Qwen2.5-0.5B-Instruct"
+    model_name_or_path = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-0.5B-Instruct")
+    # model_name_or_path = os.path.join(base_dir, SNAPSHOT_DIR)
+    dtype = os.getenv("VLLM_DTYPE", "half")  # half for A40, bf16 for A100
+    max_model_len = int(os.getenv("MAX_MODEL_LEN", "8192"))
+    gpu_mem_util = float(os.getenv("GPU_MEM_UTIL", "0.90"))
+    tp = int(os.getenv("TP", "1"))
+    enforce_eager = os.getenv("ENFORCE_EAGER", "1") == "1"
+    cache_dir=os.getenv("VLLM_DOWNLOAD_DIR", "./cache")
+
     model_wrapper = ModelWrapper(
         model_name_or_path=model_name_or_path,
-        cache_dir="./cache",
-        tensor_parallel_size= 1,
-        gpu_memory_utilization= 0.9,
+        cache_dir=cache_dir,
+        tensor_parallel_size=tp,
+        gpu_memory_utilization=gpu_mem_util,
+        dtype=dtype,
+        max_model_len=max_model_len,
+        enforce_eager=enforce_eager,
     )
 
     # -------------------------------------------------
@@ -43,7 +52,6 @@ def main():
         repetition_penalty=1.0,
     )
 
-
     # -------------------------------------------------
     # CAI components
     # -------------------------------------------------
@@ -52,65 +60,32 @@ def main():
         model_wrapper=model_wrapper,
     )
 
-    enable_critique=True
-    max_revisions=1
     pipeline = ConstitutionalAIPipeline(
         critic=critic,
-        sampling_params=sampling_params,
-        enable_critique=enable_critique,
-        max_revisions=max_revisions,
+        sampling_params=sampling_params
     )
-
-    # -------------------------------------------------
-    # Output setup
-    # -------------------------------------------------
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_file = f"output_{timestamp}.jsonl"
-    os.makedirs(OUTPUT_PATH, exist_ok=True)
-    output_path = os.path.join(base_dir, OUTPUT_PATH, output_file)
-
-    if not os.path.exists(output_path):
-        open(output_path, "w").close()
 
     print("[INFO] Starting Constitutional AI generation...")
     print(f"[INFO] Model: {model_name_or_path}")
-    print(f"[INFO] Critique enabled: {enable_critique}")
-    print(f"[INFO] Max revisions: {max_revisions}")
+    print(f"[INFO] MODE: Initial generation: {INIT_GENERATION_MODE}")
+    print(f"[INFO] MODE: Critique: {CRITIQUE_MODE}")
+    print(f"[INFO] MODE: Revision: {REVISION_MODE}")
+    print(f"[INFO] Current Iteration: {CURRENT_ITERATION}")
 
-    # -------------------------------------------------
-    # Load dataset
-    # -------------------------------------------------
-    data_mgr = DataManager()
-    data_mgr.prepare(count=1,force_download=False)
-
-    dataset = data_mgr.load_local_prompts()
-    print(f"[INFO] Loaded dataset with {len(dataset)} samples.")
-
-    # -------------------------------------------------
-    # Process samples
-    # -------------------------------------------------
-    for data in enumerate(dataset):
-        sample = data[1]["prompt"]
-        print(f"[CAI] Processing sample {sample}...")
-
-        # Construct user prompt
-        user_prompt = (
-            f"""Please provide a helpful, factual answer to the following question.
-
-            Question:
-            {sample}"""
-        )
-
-        cai_result = pipeline.run(user_prompt)
-
-        pipeline.save_constitutional_output(
-            user_prompt=user_prompt,
-            cai_result=cai_result,
-            output_file=output_path,
-        )
+    if INIT_GENERATION_MODE and CURRENT_ITERATION==0:
+        pipeline.run_initial_generation()
+    elif CRITIQUE_MODE:
+        pipeline.run_critique()
+    elif REVISION_MODE:
+        pipeline.run_revision()
 
     print("[INFO] Constitutional AI generation completed.")
 
+import multiprocessing as mp
+mp.set_start_method("spawn", force=True)
+
 if __name__ == "__main__":
     main()
+
+
 

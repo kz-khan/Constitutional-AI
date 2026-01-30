@@ -26,7 +26,10 @@ class DataManager:
             download_mode="force_redownload" if force_download else "reuse_dataset_if_exists"
         )
         
-        subset = dataset.select(range(min(count, len(dataset))))
+        dataset = dataset.shuffle(seed=42)
+        subset = dataset.select(range(count))
+
+        print(len(subset))
         
         seed_data = []
         for item in subset:
@@ -41,7 +44,10 @@ class DataManager:
         
         print(f"Seed prompts saved to {self.output_path}")
 
-    def load_local_prompts(self):
-        """Helper to load the file once it exists."""
-        with open(self.output_path, "r") as f:
-            return json.load(f)
+    def load_local_prompts(self, count=None):
+        with open(self.output_path, "r", encoding="utf-8") as f:
+            data = json.load(f)   # ✅ loads the whole JSON list
+
+        if count is not None:
+            return data[:count]
+        return data
