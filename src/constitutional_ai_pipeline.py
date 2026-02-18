@@ -97,19 +97,19 @@ class ConstitutionalAIPipeline:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = f"output_{timestamp}.jsonl"
-        output_path = os.path.join(base_dir, OUTPUT_PATH, "iteration_0", "initial_generations", output_file)
+        output_path = os.path.join(base_dir, OUTPUT_PATH, self.critic.model.model_name_or_path, "iteration_0", "initial_generations", output_file)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         self.write_jsonl(output_path, rows)
 
     def run_critique(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         iteration_dir = "iteration_0"       
-        gen_dir = os.path.join(base_dir, OUTPUT_PATH, iteration_dir, "initial_generations")
+        gen_dir = os.path.join(base_dir, OUTPUT_PATH, self.critic.model.model_name_or_path, iteration_dir, "initial_generations")
         
         if CURRENT_ITERATION>0:
             prev_iteration = CURRENT_ITERATION - 1
             iteration_dir = f"iteration_{prev_iteration}"
-            gen_dir = os.path.join(base_dir, OUTPUT_PATH, iteration_dir, "revisions")
+            gen_dir = os.path.join(base_dir, OUTPUT_PATH, self.critic.model.model_name_or_path, iteration_dir, "revisions")
 
         print(f"Current iteration:{CURRENT_ITERATION}, critique using file: {gen_dir}")
 
@@ -149,19 +149,14 @@ class ConstitutionalAIPipeline:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = f"output_{timestamp}.jsonl"
         current_iteration_dir = f"iteration_{CURRENT_ITERATION}" 
-        output_path = os.path.join(base_dir, OUTPUT_PATH, current_iteration_dir, "critiques", output_file)
+        output_path = os.path.join(base_dir, OUTPUT_PATH, self.critic.model.model_name_or_path, current_iteration_dir, "critiques", output_file)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         self.write_jsonl(output_path, crit_rows)
 
     def run_revision(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        iteration_dir = "iteration_0"
-        crit_dir = os.path.join(base_dir, OUTPUT_PATH, iteration_dir, "critiques")
-
-        if CURRENT_ITERATION>0:
-            prev_iteration = CURRENT_ITERATION - 1
-            iteration_dir = f"iteration_{prev_iteration}"
-            crit_dir = os.path.join(base_dir, OUTPUT_PATH, iteration_dir, "critiques")
+        iteration_dir = f"iteration_{CURRENT_ITERATION}"
+        crit_dir = os.path.join(base_dir, OUTPUT_PATH, self.critic.model.model_name_or_path, iteration_dir, "critiques")
 
         print(f"Current iteration:{CURRENT_ITERATION}, revision using file: {crit_dir}")
 
@@ -196,7 +191,7 @@ class ConstitutionalAIPipeline:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = f"output_{timestamp}.jsonl"
         current_iteration_dir = f"iteration_{CURRENT_ITERATION}"
-        output_path = os.path.join(base_dir, OUTPUT_PATH, current_iteration_dir, "revisions", output_file)
+        output_path = os.path.join(base_dir, OUTPUT_PATH, self.critic.model.model_name_or_path, current_iteration_dir, "revisions", output_file)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         self.write_jsonl(output_path, rev_rows)
 
