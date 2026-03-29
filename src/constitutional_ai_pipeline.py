@@ -61,17 +61,17 @@ class ConstitutionalAIPipeline:
         # Load dataset
         # -------------------------------------------------
         data_mgr = DataManager()
-        data_mgr.prepare(count=1960,force_download=True)
+        data_mgr.prepare(count=1960,force_download=False)
 
         dataset = data_mgr.load_local_prompts(count=None) # we will work with 100 samples
         print(f"[INFO] Loaded dataset with {len(dataset)} samples.")        
 
         rows = []
-        for item in dataset:            
+        for i, item in enumerate(dataset):            
             pid = item["id"]
             prompt = item["prompt"]
 
-            print(f"[CAI] Processing sample {prompt}...")
+            print(f"[CAI] Processing sample {i}: {prompt}...")
 
             # Construct user prompt
             user_prompt = (
