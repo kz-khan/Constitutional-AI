@@ -8,7 +8,7 @@ class DataManager:
         self.output_path = base_dir + "/" + output_path
         os.makedirs(os.path.dirname(self.output_path), exist_ok=True)
 
-    def prepare(self, count=100, force_download=False):
+    def prepare(self, count=1960, force_download=False):
         """
         Runs once to ensure the seed dataset is ready.
         """
