@@ -17,17 +17,17 @@ MAX_REVISIONS = 3
 # Uncomment and use one block
 
 # --------- Iteration 0 initial generation ---------------
-# INIT_GENERATION_MODE = True
-# CRITIQUE_MODE = False
-# REVISION_MODE = False
-# CURRENT_ITERATION = 0
+INIT_GENERATION_MODE = True
+CRITIQUE_MODE = False
+REVISION_MODE = False
+CURRENT_ITERATION = 0
 
 # --------- Iteration 0 initial critique ---------------
 
-INIT_GENERATION_MODE = False
-CRITIQUE_MODE = True
-REVISION_MODE = False
-CURRENT_ITERATION = 0
+# INIT_GENERATION_MODE = False
+# CRITIQUE_MODE = True
+# REVISION_MODE = False
+# CURRENT_ITERATION = 0
 
 # --------- Iteration 0 initial revision ---------------
 
