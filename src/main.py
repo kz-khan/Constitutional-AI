@@ -22,7 +22,7 @@ def main():
     # -------------------------------------------------
     # Load model + tokenizer (via ModelWrapper)
     # -------------------------------------------------
-    model_name_or_path = os.getenv("MODEL_NAME", "huihui-ai/Qwen2.5-7B-Instruct-abliterated-v3 ")
+    model_name_or_path = os.getenv("MODEL_NAME", "huihui-ai/Qwen2.5-7B-Instruct-abliterated-v3")
     # model_name_or_path = os.path.join(base_dir, SNAPSHOT_DIR)
     dtype = os.getenv("VLLM_DTYPE", "half")  # half for A40, bf16 for A100
     max_model_len = int(os.getenv("MAX_MODEL_LEN", "8192"))
