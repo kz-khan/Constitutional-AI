@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=cai-qwen-3-3b
+#SBATCH --job-name=cai-qwen-2.5
 #SBATCH --partition=A40short
 #SBATCH --gres=gpu:1
 #SBATCH --mem=40G
@@ -29,7 +29,7 @@ export VLLM_DOWNLOAD_DIR="$SLURM_SUBMIT_DIR/cache"
 mkdir -p "$HF_HOME" "$HF_HUB_CACHE" "$VLLM_DOWNLOAD_DIR"
 
 # Model config
-export MODEL_NAME="Qwen/Qwen3-4B-Instruct-2507"
+export MODEL_NAME="Qwen/Qwen2.5-7B-Instruct"
 export VLLM_DTYPE="half"
 export MAX_MODEL_LEN="8192"
 export GPU_MEM_UTIL="0.90"
